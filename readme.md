@@ -46,7 +46,7 @@ pip install -e .
         
 4. **Pre-process scans**
 
-    -    Preprocess your `images*` folders with the [Merlin transforms](https://github.com/StanfordMIMI/Merlin/blob/02c1e05a484a6e8f0949d4fab8a2edf7e7cdf012/merlin/data/monai_transforms.py#L13). 
+    -    Preprocess your `images*` folders with the [Merlin transforms](https://github.com/StanfordMIMI/Merlin/blob/02c1e05a484a6e8f0949d4fab8a2edf7e7cdf012/merlin/data/monai_transforms.py#L13). Do not use the `ScaleIntensityRanged` transform to normalize the CT images. nnU-Net will do CT normalization in `nnUNetPlans.json`.
     
     -    Save the transformed image as a NIfTI in the `images*` directories. 
 

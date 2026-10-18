@@ -11,6 +11,8 @@ import os
 
 from huggingface_hub import hf_hub_download
 
+from torch._dynamo import OptimizedModule
+
 
 def download_file(
     repo_id: str,
@@ -76,9 +78,25 @@ class nnUNetTrainerMerlin(nnUNetTrainer):
         return model
         
 
+    # def set_deep_supervision_enabled(self, enabled: bool):
+    #     """
+    #     This function is specific for the default architecture in nnU-Net. If you change the architecture, there are
+    #     chances you need to change this as well!
+    #     """
+    #     pass
+
     def set_deep_supervision_enabled(self, enabled: bool):
         """
-        This function is specific for the default architecture in nnU-Net. If you change the architecture, there are
-        chances you need to change this as well!
+        Enable or disable deep supervision in Merlin's UNetDecoder.
+        The network is nn.Sequential(encoder, decoder).
         """
-        pass
+        if self.is_ddp:
+            mod = self.network.module
+        else:
+            mod = self.network
+
+        if isinstance(mod, OptimizedModule):
+            mod = mod._orig_mod
+
+        # Merlin network = Sequential(image_encoder, unet_decoder)
+        mod[1].deep_supervision = enabled
